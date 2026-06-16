@@ -12,9 +12,21 @@ import type { PortfolioItem } from "@/types";
 
 const SHOW_COUNT = 3;
 
+/** 从视频路径中提取文件夹编号和文件编号作为排序键 */
+function getSortKey(item: PortfolioItem): string {
+  // /videos/1机甲/1-xxx.mp4 → folderNum=1, fileNum=1
+  const match = item.videoSrc.match(/\/videos\/(\d+)[^/]*\/(\d+)-/);
+  if (match) return match[1].padStart(4, "0") + match[2].padStart(4, "0");
+  return "";
+}
+
 function groupByCategory(items: PortfolioItem[]) {
   const map = new Map<string, PortfolioItem[]>();
-  for (const item of items) {
+  // 按文件夹编号+文件编号排序
+  const sorted = [...items].sort(
+    (a, b) => getSortKey(a).localeCompare(getSortKey(b))
+  );
+  for (const item of sorted) {
     const list = map.get(item.category) ?? [];
     list.push(item);
     map.set(item.category, list);

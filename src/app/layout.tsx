@@ -10,12 +10,12 @@ const notoSansSC = Noto_Sans_SC({
 });
 
 export const metadata: Metadata = {
-  title: "ZHC - CG艺术家 / 动画导演",
-  description: "ZHC个人作品集 — CG动画、视觉特效、数字艺术创作",
-  keywords: ["CG", "动画", "视觉特效", "3D", "Blender", "Maya", "个人作品集"],
+  title: "ZHC - 游戏广告设计师 / AI创意设计师",
+  description: "ZHC个人作品集 — 游戏广告设计、AI创意制作、视觉特效",
+  keywords: ["游戏广告", "AI创意", "视觉特效", "视频设计", "游戏买量", "个人作品集"],
   openGraph: {
-    title: "ZHC - CG艺术家 / 动画导演",
-    description: "用镜头语言打造沉浸式视觉体验",
+    title: "ZHC - 游戏广告设计师 / AI创意设计师",
+    description: "以AI驱动的视觉创意，定义游戏广告新可能",
     type: "website",
     locale: "zh_CN",
   },
