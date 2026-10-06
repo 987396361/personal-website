@@ -1,105 +1,24 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import CircularCarousel from "@/components/ui/CircularCarousel";
+import VideoModal from "@/components/ui/VideoModal";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 import SectionHeading from "@/components/ui/SectionHeading";
-import VideoCard from "@/components/ui/VideoCard";
-import VideoModal from "@/components/ui/VideoModal";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import siteConfig from "@/data/content";
 import type { PortfolioItem } from "@/types";
 
-const SHOW_COUNT = 3;
-
-/** 从视频路径中提取文件夹编号和文件编号作为排序键 */
-function getSortKey(item: PortfolioItem): string {
-  // /videos/1机甲/1-xxx.mp4 → folderNum=1, fileNum=1
-  const match = item.videoSrc.match(/\/videos\/(\d+)[^/]*\/(\d+)-/);
-  if (match) return match[1].padStart(4, "0") + match[2].padStart(4, "0");
-  return "";
-}
-
-function groupByCategory(items: PortfolioItem[]) {
-  const map = new Map<string, PortfolioItem[]>();
-  // 按文件夹编号+文件编号排序
-  const sorted = [...items].sort(
-    (a, b) => getSortKey(a).localeCompare(getSortKey(b))
-  );
-  for (const item of sorted) {
-    const list = map.get(item.category) ?? [];
-    list.push(item);
-    map.set(item.category, list);
-  }
-  return map;
-}
-
-function CategoryGrid({
-  items,
-  isExpanded,
-  reduced,
-  onPlay,
-}: {
-  items: PortfolioItem[];
-  isExpanded: boolean;
-  reduced: boolean;
-  onPlay: (item: PortfolioItem) => void;
-}) {
-  const hasMore = items.length > SHOW_COUNT;
-  const visibleItems = hasMore && !isExpanded ? items.slice(0, SHOW_COUNT) : items;
-  const gridRef = useRef<HTMLDivElement>(null);
-  const [inView, setInView] = useState(false);
-
-  useEffect(() => {
-    const el = gridRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) setInView(true);
-      },
-      { rootMargin: "100px", threshold: 0 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
-  const shouldAnimate = inView;
-
-  return (
-    <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-      {visibleItems.map((item, i) => (
-        <motion.div
-          key={item.id}
-          initial={reduced ? undefined : { opacity: 0, y: 30 }}
-          animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.5, delay: reduced ? 0 : i * 0.08 }}
-          layout
-        >
-          <VideoCard item={item} onPlay={onPlay} />
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
 export default function Portfolio() {
   const [activeItem, setActiveItem] = useState<PortfolioItem | null>(null);
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  // 当前转到最前方的作品序号（初始为第一个作品）
+  const [activeIndex, setActiveIndex] = useState(0);
   const reduced = useReducedMotion();
 
-  const grouped = groupByCategory(siteConfig.portfolioItems);
-
-  const toggleExpand = (category: string) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(category)) {
-        next.delete(category);
-      } else {
-        next.add(category);
-      }
-      return next;
-    });
-  };
+  // 所有作品统一放入一个轮播：卡片为视频首帧 + 中央播放图标，点击卡片打开播放器弹窗
+  const items = siteConfig.portfolioItems;
+  const activeCategory = items[activeIndex]?.category ?? "";
 
   return (
     <SectionWrapper id="portfolio">
@@ -108,56 +27,44 @@ export default function Portfolio() {
         subtitle="精选游戏广告与AI创意作品集"
       />
 
-      <div className="space-y-16">
-        {Array.from(grouped.entries()).map(([category, items]) => {
-          const hasMore = items.length > SHOW_COUNT;
-          const isExpanded = expanded.has(category);
-          const hiddenCount = items.length - SHOW_COUNT;
+      {/* 圆形 3D 轮播：全部视频围绕成环，可拖拽甩动浏览 */}
+      <div className="relative w-full h-[clamp(420px,65vw,640px)]">
+        <CircularCarousel
+          items={items.map((item) => ({
+            src: item.videoSrc,
+            alt: item.description,
+            title: item.title,
+            subtitle: item.description,
+          }))}
+          preset="orbit"
+          intro="rise"
+          cardWidth={200}
+          aspectRatio={0.68}
+          gap={20}
+          spread={1}
+          speed={12}
+          tilt={-12}
+          fadeColor="#06060e"
+          showPlayIcon
+          onChange={setActiveIndex}
+          onItemClick={(_, index) => setActiveItem(items[index])}
+        />
+      </div>
 
-          return (
-            <div key={category}>
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-medium text-foreground">
-                  {category}
-                  <span className="ml-2 text-sm text-muted font-normal">
-                    {items.length} 个作品
-                  </span>
-                </h3>
-              </div>
-
-              <CategoryGrid
-                items={items}
-                isExpanded={isExpanded}
-                reduced={reduced}
-                onPlay={setActiveItem}
-              />
-
-              {hasMore && (
-                <div className="mt-6 text-center">
-                  <button
-                    onClick={() => toggleExpand(category)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium
-                      glass border border-white/[0.08] text-muted
-                      hover:text-foreground hover:bg-white/[0.08] transition-all duration-300"
-                  >
-                    {isExpanded ? "收起" : `展开更多 (+${hiddenCount})`}
-                    <motion.svg
-                      className="w-4 h-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      animate={{ rotate: isExpanded ? 180 : 0 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <path d="M6 9l6 6 6-6" />
-                    </motion.svg>
-                  </button>
-                </div>
-              )}
-            </div>
-          );
-        })}
+      {/* 当前最前方视频的分类文字，随转动实时切换 */}
+      <div className="mt-6 flex justify-center h-9">
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={activeCategory}
+            initial={reduced ? undefined : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduced ? undefined : { opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }}
+            className="text-xl md:text-2xl font-semibold tracking-wide text-foreground"
+          >
+            {activeCategory}
+          </motion.span>
+        </AnimatePresence>
       </div>
 
       <VideoModal item={activeItem} onClose={() => setActiveItem(null)} />

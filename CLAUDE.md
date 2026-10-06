@@ -4,6 +4,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 语言要求
+
+- 所有对话使用中文。
+- 所有文档使用中文。
+- 所有代码注释使用中文。
+
+## 执行要求
+
+- 在生成说明、总结、计划、提交说明时，统一使用中文。
+- 在新增或修改 Markdown 文档时，统一使用中文。
+- 在新增或修改代码注释时，统一使用中文。
+
 ## 项目概述
 
 ZHC 个人品牌网站 — 展示游戏广告设计 / AI 创意设计作品集的单页网站。使用 Next.js 16 + React 19 + Tailwind CSS v4 + Framer Motion 构建，静态导出部署。
@@ -80,17 +92,51 @@ src/app/page.tsx            # 主页面：组装所有 section + 特效层
 视频文件存放在 `public/videos/`，按数字前缀的类别文件夹组织：
 ```
 public/videos/
-├── 1机甲/       # 1-xxx.mp4 ~ 7-xxx.mp4
-├── 2三国SLG/    # 1-xxx.mp4 ~ 4-xxx.mp4
-├── 3种花/       # 1-xxx.mp4 ~ 8-xxx.mp4
-├── 4传奇/       # 1-xxx.mp4 ~ 8-xxx.mp4
-└── 5熊猫/       # 1-xxx.mp4 ~ 4-xxx.mp4
+├── 1Puzzle/        # 竖版
+├── 2Merge/         # 竖版
+├── 3数独/          # 竖版
+├── 4割草/          # 竖版
+├── 5模拟经营/      # 竖版
+├── 6三国SLG/       # 横版（保持大卡布局）
+├── 二合脚本演示视频/
+├── 传奇脚本演示视频/
+└── 头图视频/
 ```
 
-Portfolio 组件通过视频路径中的数字前缀自动排序（`/videos/(\d+)[^/]*/(\d+)-`），新增分类只需在 `content.ts` 中添加对应 `portfolioItems` 即可。
+Portfolio 布局：竖版分类一行两个类型、每类最多 3 个 9:16 竖版卡片（无文字）；`portfolioLandscapeCategories` 中列出的分类（三国SLG）用横版大卡（带标题/描述）。作品顺序由 `content.ts` 中 `portfolioItems` 的排列顺序决定，新增分类或换视频只需编辑该数组。
+
+## 部署
+
+> ⚠️ **服务器已到期（2026-09 起）**：zichuanhai.top 服务器已到期，后续更新只做本地修改，不再部署到服务器。等用户购买新服务器后再恢复部署。
+
+### 服务器信息
+
+- **生产地址**：http://121.40.220.150/ / https://zichuanhai.top/
+- **服务器访问**：`ssh root@121.40.220.150`
+- **Web 根目录**：`/var/www/zhc-site/`
+
+### 部署流程
+
+```bash
+# 1. 构建
+npm run build
+
+# 2. 上传静态文件
+cd out
+scp index.html 404.html _not-found.html favicon.ico root@121.40.220.150:/var/www/zhc-site/
+scp -r _next root@121.40.220.150:/var/www/zhc-site/
+
+# 3. 如果视频有新增/变更，上传 videos 目录
+scp -r videos root@121.40.220.150:/var/www/zhc-site/
+
+# 4. 如果有旧类别被移除，需手动清理服务器旧目录
+ssh root@121.40.220.150 "rm -rf /var/www/zhc-site/videos/旧目录名"
+```
+
+> scp 上传是合并模式，不会自动删除服务器旧文件。如果重构了视频目录结构（重命名/删除类别），需要手动 SSH 进去清理旧目录。
 
 ### Git 远程
 
 - 远程地址：`git@github.com:987396361/personal-website.git`
-- 当前分支：`master`
-- 注意：视频文件较大（~80MB+），避免添加更多大文件导致 GitHub 拒绝推送
+- 分支：`master`
+- 注意：视频文件较大（~80MB+），避免添加更多大文件导致 GitHub 拒绝推送。除非用户明确要求，否则不要主动 `git push`。

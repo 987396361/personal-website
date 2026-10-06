@@ -93,6 +93,13 @@
   background-clip: text;
 }
 
+/* 首屏全屏视频的背景光晕占位（视频未提供时显示） */
+@utility hero-bg-glow {
+  background:
+    radial-gradient(ellipse 55% 65% at 55% 45%, rgb(99 102 241 / 0.3) 0%, transparent 70%),
+    radial-gradient(ellipse 35% 45% at 70% 35%, rgb(129 140 248 / 0.15) 0%, transparent 70%);
+}
+
 html {
   scroll-behavior: smooth;
 }

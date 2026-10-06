@@ -5,6 +5,7 @@ import { useReducedMotion } from "@/hooks/useReducedMotion";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 import SectionHeading from "@/components/ui/SectionHeading";
 import SkillBadge from "@/components/ui/SkillBadge";
+import Scripts from "@/components/sections/Scripts";
 import siteConfig from "@/data/content";
 
 const categoryLabels: Record<string, string> = {
@@ -63,6 +64,9 @@ export default function Skills() {
           </div>
         ))}
       </div>
+
+      {/* 脚本创作展示区 */}
+      <Scripts />
     </SectionWrapper>
   );
 }

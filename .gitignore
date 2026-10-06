@@ -40,8 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# claude code
+# 部署产物与本地工具文件
+/deploy.tar.gz
 .claude/
-
-# deploy
-deploy.tar.gz
+*.shot-debug.png

@@ -10,7 +10,7 @@ export default function Contact() {
     <SectionWrapper id="contact">
       <SectionHeading
         title="联系方式"
-        subtitle="期待与您合作，一起创造令人惊叹的视觉作品"
+        subtitle="期待与您合作"
       />
 
       <GlassCard className="max-w-lg mx-auto text-center">

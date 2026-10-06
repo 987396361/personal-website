@@ -34,7 +34,8 @@ export default function Navbar() {
     <>
       <nav
         className={cn(
-          "fixed top-0 left-0 right-0 z-40 px-6 md:px-8 lg:px-12 py-4",
+          // 左右边距与首屏文字保持一致（lg 下 300px）
+          "fixed top-0 left-0 right-0 z-40 px-6 md:px-16 lg:px-[300px] py-4",
           "transition-all duration-300",
           isScrolled
             ? "bg-black/40 backdrop-blur-2xl border-b border-white/[0.06]"
@@ -42,7 +43,8 @@ export default function Navbar() {
         )}
         style={{ WebkitBackdropFilter: isScrolled ? "blur(24px)" : "blur(0px)" }}
       >
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+        {/* 不限制宽度：logo 靠最左，导航链接靠最右 */}
+        <div className="flex items-center justify-between">
           <button
             onClick={() => handleNavClick("hero")}
             className="text-lg font-semibold tracking-tight text-foreground hover:text-accent-light transition-colors"

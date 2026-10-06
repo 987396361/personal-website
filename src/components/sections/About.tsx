@@ -10,9 +10,10 @@ export default function About() {
     <SectionWrapper id="about">
       <SectionHeading
         title="关于我"
-        subtitle="一位热衷于视觉叙事与CG创作的数字艺术家"
+        subtitle="广告设计师/AI创意设计师"
       />
-      <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 items-start">
+      {/* 300px 大边距下，头像与文字并排推迟到 xl 断点，避免窄屏桌面文字被挤成细条 */}
+      <div className="flex flex-col xl:flex-row gap-8 xl:gap-16 items-start">
         {/* Avatar */}
         <div className="flex-shrink-0">
           <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl glass gradient-border flex items-center justify-center shadow-glass overflow-hidden">

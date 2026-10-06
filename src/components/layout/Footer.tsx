@@ -8,8 +8,8 @@ export default function Footer() {
   };
 
   return (
-    <footer className="py-8 px-6 border-t border-white/[0.04]">
-      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+    <footer className="py-8 px-6 md:px-16 lg:px-[300px] border-t border-white/[0.04]">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <p className="text-sm text-muted">
           &copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
         </p>

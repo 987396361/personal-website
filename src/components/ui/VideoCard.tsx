@@ -2,12 +2,14 @@
 
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import type { VideoCardProps } from "@/types";
 
-export default function VideoCard({ item, onPlay }: VideoCardProps) {
+export default function VideoCard({ item, onPlay, variant = "landscape" }: VideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const isPortrait = variant === "portrait";
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -32,8 +34,14 @@ export default function VideoCard({ item, onPlay }: VideoCardProps) {
       whileHover={{ y: -6 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
-      <div className="glass gradient-border rounded-2xl overflow-hidden shadow-glass-sm transition-shadow duration-300 group-hover:shadow-glass-lg">
-        <div className="aspect-video relative bg-surface-light">
+      <div
+        className={cn(
+          "glass gradient-border overflow-hidden shadow-glass-sm transition-shadow duration-300 group-hover:shadow-glass-lg",
+          isPortrait ? "rounded-xl" : "rounded-2xl"
+        )}
+      >
+        {/* 竖版卡片为 9:16，横版卡片为 16:9 */}
+        <div className={cn("relative bg-surface-light", isPortrait ? "aspect-[9/16]" : "aspect-video")}>
           {!isLoaded && (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-8 h-8 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
@@ -52,23 +60,36 @@ export default function VideoCard({ item, onPlay }: VideoCardProps) {
           />
           {!isHovered && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity duration-300 group-hover:bg-black/0">
-              <div className="w-14 h-14 rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                <svg className="w-5 h-5 text-white ml-0.5" viewBox="0 0 24 24" fill="currentColor">
+              <div
+                className={cn(
+                  "rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center transition-transform duration-300 group-hover:scale-110",
+                  isPortrait ? "w-11 h-11" : "w-14 h-14"
+                )}
+              >
+                <svg
+                  className={cn("text-white ml-0.5", isPortrait ? "w-4 h-4" : "w-5 h-5")}
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
                   <path d="M8 5.14v14l11-7-11-7z" />
                 </svg>
               </div>
             </div>
           )}
         </div>
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-accent font-medium tracking-wide uppercase">
-              {item.category}
-            </span>
+
+        {/* 竖版卡片不显示下方文字；横版保留分类 / 标题 / 描述 */}
+        {!isPortrait && (
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-accent font-medium tracking-wide uppercase">
+                {item.category}
+              </span>
+            </div>
+            <h3 className="text-base font-medium text-foreground mb-1">{item.title}</h3>
+            <p className="text-sm text-muted line-clamp-1">{item.description}</p>
           </div>
-          <h3 className="text-base font-medium text-foreground mb-1">{item.title}</h3>
-          <p className="text-sm text-muted line-clamp-1">{item.description}</p>
-        </div>
+        )}
       </div>
     </motion.div>
   );
